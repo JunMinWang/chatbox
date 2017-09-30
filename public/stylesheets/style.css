@@ -1,0 +1,25 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+ul#chatbox li {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+}
+
+li.alert {
+  color: #227700;
+  font: 14px;
+  font-weight: bolder;
+  line-height: 18px;
+}
+
+.username {
+  color: #0000FF;
+}

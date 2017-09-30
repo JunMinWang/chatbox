@@ -1,0 +1,92 @@
+extends layout
+
+block content
+    .container
+        .row
+            .col-sm-12
+                article.chat
+                    .chat-header
+                        .chat-title
+                            h1| 聊天室
+                    .form-horizontal.chat-form(name='chatForm')
+                        .form-group
+                            label.col-sm-2.control-label(for='chat-username') 姓名
+                            .col-sm-10
+                                input#name.form-control(type='text', placeholder='Enter your name' readonly)
+                        .form-group
+                            label.col-sm-2.control-label(for='chat-message') 訊息
+                            .col-sm-10
+                                .input-group
+                                    input#chatmsg.form-control(type='text', placeholder='Enter a message, then press enter', rows='2', autocomplete='off', required='')
+                                    span.input-group-btn
+                                        button#chat-submit.btn.btn-info(type='submit' onclick='send()') 送出
+                    .panel.panel-default
+                        .panel-body.chat-display
+                            ul#userlist 線上人數
+                    .panel.panel-default
+                        .panel-body.chat-display
+                            ul#chatbox
+block script
+    script.
+        var socket = io.connect('/');
+        window.onload = function() { 
+            var name = '';
+            var chatbox = document.getElementById('chatbox');
+            var userlist = document.getElementById('userlist');
+            while('' === name.trim() || null == name.trim()) {
+                name = prompt('請輸入暱稱:');
+            }
+            document.getElementById('name').value = name;
+            socket.emit('joinchat', {name: name});
+
+            socket.on('joinchat', function(data) {
+                var li = document.createElement('li');
+                li.setAttribute('class', 'alert');
+                li.appendChild(document.createTextNode(data.name + '加入聊天!'));
+                chatbox.appendChild(li);
+                userlist.innerHTML = "線上人數";
+                for(var key in data.userlist) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(data.userlist[key].name));
+                    userlist.appendChild(li);
+                }
+            });
+
+            socket.on('onmsg', function(data) {
+                var li = document.createElement('li');
+                var user = document.createElement('span');
+                user.setAttribute('class', 'username');
+                user.appendChild(document.createTextNode(data.user));
+                li.appendChild(user);
+                li.appendChild(document.createTextNode(": " + data.msg));
+                chatbox.appendChild(li);
+            });
+
+            socket.on('onclose', function(data) {
+                console.log(data);
+                var li = document.createElement('li');
+                li.setAttribute('class', 'alert');
+                li.appendChild(document.createTextNode(data.name + '已經離線!'));
+                chatbox.appendChild(li);
+                userlist.innerHTML = "線上人數";
+                for(var key in data.userlist) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(data.userlist[key].name));
+                    userlist.appendChild(li);
+                }
+            });
+        }
+
+        window.onunload = function() {
+            var user = document.getElementById('name').value;
+            socket.emit('close', {user: user});
+        }
+
+        function send() {
+            var msgbox = document.getElementById('chatmsg');
+            var user = document.getElementById('name').value;
+            if(msgbox.value !== '') {
+                socket.emit('sendmsg', {user: user, msg: msgbox.value});
+                msgbox.value = '';
+            }
+        }
