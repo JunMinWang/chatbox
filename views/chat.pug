@@ -33,9 +33,10 @@ block script
             var name = '';
             var chatbox = $('#chatbox');
             var userlist = $('#userlist');
-            while('' === name.trim() || null == name.trim()) {
+            while(null == name || 0 === name.trim().length) {
                 name = prompt('請輸入暱稱:');
             }
+
             $('#name').val(name);
             socket.emit('joinchat', {name: name});
 
