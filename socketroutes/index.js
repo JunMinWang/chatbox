@@ -4,7 +4,6 @@ module.exports = function(socket) {
     socket.on('joinchat', function(data) {
         console.log(data.name + '加入聊天室');
         userlist.push({name: data.name});
-        console.log('userlist:'+ userlist);
         io.emit('joinchat', {name: data.name, userlist: userlist});
     });
 

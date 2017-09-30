@@ -8,7 +8,7 @@ block content
                     .chat-header
                         .chat-title
                             h1| 聊天室
-                    .form-horizontal.chat-form(name='chatForm')
+                    form#chatform.form-horizontal.chat-form(name='chatForm')
                         .form-group
                             label.col-sm-2.control-label(for='chat-username') 姓名
                             .col-sm-10
@@ -17,7 +17,7 @@ block content
                             label.col-sm-2.control-label(for='chat-message') 訊息
                             .col-sm-10
                                 .input-group
-                                    input#chatmsg.form-control(type='text', placeholder='Enter a message, then press enter', rows='2', autocomplete='off', required='')
+                                    input#chatmsg.form-control(type='text', placeholder='Enter a message, then press enter', rows='2', autocomplete='off')
                                     span.input-group-btn
                                         button#chat-submit.btn.btn-info(type='submit' onclick='send()') 送出
                     .panel.panel-default
@@ -31,24 +31,24 @@ block script
         var socket = io.connect('/');
         window.onload = function() { 
             var name = '';
-            var chatbox = document.getElementById('chatbox');
-            var userlist = document.getElementById('userlist');
+            var chatbox = $('#chatbox');
+            var userlist = $('#userlist');
             while('' === name.trim() || null == name.trim()) {
                 name = prompt('請輸入暱稱:');
             }
-            document.getElementById('name').value = name;
+            $('#name').val(name);
             socket.emit('joinchat', {name: name});
 
             socket.on('joinchat', function(data) {
                 var li = document.createElement('li');
                 li.setAttribute('class', 'alert');
                 li.appendChild(document.createTextNode(data.name + '加入聊天!'));
-                chatbox.appendChild(li);
-                userlist.innerHTML = "線上人數";
+                chatbox.append(li);
+                userlist.html("線上人數");
                 for(var key in data.userlist) {
                     var li = document.createElement('li');
                     li.appendChild(document.createTextNode(data.userlist[key].name));
-                    userlist.appendChild(li);
+                    userlist.append(li);
                 }
             });
 
@@ -59,7 +59,7 @@ block script
                 user.appendChild(document.createTextNode(data.user));
                 li.appendChild(user);
                 li.appendChild(document.createTextNode(": " + data.msg));
-                chatbox.appendChild(li);
+                chatbox.append(li);
             });
 
             socket.on('onclose', function(data) {
@@ -67,26 +67,31 @@ block script
                 var li = document.createElement('li');
                 li.setAttribute('class', 'alert');
                 li.appendChild(document.createTextNode(data.name + '已經離線!'));
-                chatbox.appendChild(li);
-                userlist.innerHTML = "線上人數";
+                chatbox.append(li);
+                userlist.html("線上人數");
                 for(var key in data.userlist) {
                     var li = document.createElement('li');
                     li.appendChild(document.createTextNode(data.userlist[key].name));
-                    userlist.appendChild(li);
+                    userlist.append(li);
                 }
             });
         }
 
         window.onunload = function() {
-            var user = document.getElementById('name').value;
+            var user = $('#name').val();
             socket.emit('close', {user: user});
         }
 
         function send() {
-            var msgbox = document.getElementById('chatmsg');
-            var user = document.getElementById('name').value;
-            if(msgbox.value !== '') {
-                socket.emit('sendmsg', {user: user, msg: msgbox.value});
-                msgbox.value = '';
+            var msgbox = $('#chatmsg');
+            var user = $('#name').val();
+            if(msgbox.val().trim() !== '') {
+                socket.emit('sendmsg', {user: user, msg: msgbox.val()});
+                msgbox.val('');
             }
         }
+
+        $('#chatform').submit(function() {
+            send();
+            return false;
+        });
