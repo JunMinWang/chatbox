@@ -53,7 +53,7 @@ block script
             });
 
             socket.on('onmsg', function(data) {
-                chatbox.append('<li><span class="username">' + data.user + '</span> [' + getTimeNow() + ']: ' + data.msg + '</li>');
+                chatbox.append('<li><span class="username">' + data.user + '[' + getTimeNow() + ']</span> : ' + data.msg + '</li>');
             });
 
             socket.on('onclose', function(data) {
