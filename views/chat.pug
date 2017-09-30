@@ -23,7 +23,7 @@ block content
                     .panel.panel-default
                         .panel-body.chat-display
                             ul#userlist 線上人數
-                    .panel.panel-default
+                    .chatdiv.panel.panel-default
                         .panel-body.chat-display
                             ul#chatbox
 block script
@@ -53,13 +53,7 @@ block script
             });
 
             socket.on('onmsg', function(data) {
-                var li = document.createElement('li');
-                var user = document.createElement('span');
-                user.setAttribute('class', 'username');
-                user.appendChild(document.createTextNode(data.user));
-                li.appendChild(user);
-                li.appendChild(document.createTextNode(": " + data.msg));
-                chatbox.append(li);
+                chatbox.append('<li><span class="username">' + data.user + '</span> [' + getTimeNow() + ']: ' + data.msg + '</li>');
             });
 
             socket.on('onclose', function(data) {
@@ -89,6 +83,14 @@ block script
                 socket.emit('sendmsg', {user: user, msg: msgbox.val()});
                 msgbox.val('');
             }
+        }
+
+        function getTimeNow() {
+            const date = new Date();
+            const h = date.getHours() >= 10 ? date.getHours() : '0' + date.getHours();
+            const m = date.getMinutes() >= 10 ? date.getMinutes() : '0' + date.getMinutes();
+            const s = date.getSeconds() >= 10 ? date.getSeconds() : '0' + date.getSeconds();
+            return h + '時' + m + '分' + s + '秒';
         }
 
         $('#chatform').submit(function() {

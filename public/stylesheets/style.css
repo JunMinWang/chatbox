@@ -23,3 +23,8 @@ li.alert {
 .username {
   color: #0000FF;
 }
+
+.chatdiv {
+  height: 500px;
+  overflow: scroll;
+}
